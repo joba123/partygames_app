@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:imposter_party/data/games.dart';
 import 'package:imposter_party/screens/games/bet_buddy_screen.dart';
+import 'package:imposter_party/screens/games/circa_screen.dart';
 import 'package:imposter_party/screens/games/bomb_screen.dart';
 import 'package:imposter_party/screens/games/fake_fact_screen.dart';
+import 'package:imposter_party/screens/games/hundred_questions_screen.dart';
 import 'package:imposter_party/screens/games/liar_screen.dart';
 import 'package:imposter_party/screens/games/never_have_i_ever_screen.dart';
 import 'package:imposter_party/screens/games/point_vote_screen.dart';
 import 'package:imposter_party/screens/games/quiz_battle_screen.dart';
 import 'package:imposter_party/screens/games/roulette_screen.dart';
+import 'package:imposter_party/screens/games/ten_out_of_ten_screen.dart';
 import 'package:imposter_party/screens/games/truth_or_dare_screen.dart';
+import 'package:imposter_party/screens/games/werewolf_screen.dart';
 import 'package:imposter_party/screens/games/word_race_screen.dart';
 import 'package:imposter_party/screens/impostor/impostor_flow_screen.dart';
 import 'package:imposter_party/screens/player_setup_screen.dart';
@@ -34,6 +38,10 @@ const _expectedScreen = <GamePlayKind, Type>{
   GamePlayKind.liar: LiarScreen,
   GamePlayKind.fakeFact: FakeFactScreen,
   GamePlayKind.bet: BetBuddyScreen,
+  GamePlayKind.werewolf: WerewolfScreen,
+  GamePlayKind.hundredQuestions: HundredQuestionsScreen,
+  GamePlayKind.tenOutOfTen: TenOutOfTenScreen,
+  GamePlayKind.circa: CircaScreen,
 };
 
 void main() {

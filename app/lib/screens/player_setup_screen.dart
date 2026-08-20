@@ -10,14 +10,18 @@ import '../widgets/buttons.dart';
 import '../widgets/player_list_tile.dart';
 import '../models/team.dart';
 import 'games/bet_buddy_screen.dart';
+import 'games/circa_screen.dart';
 import 'games/bomb_screen.dart';
 import 'games/fake_fact_screen.dart';
+import 'games/hundred_questions_screen.dart';
 import 'games/liar_screen.dart';
 import 'games/never_have_i_ever_screen.dart';
 import 'games/point_vote_screen.dart';
 import 'games/quiz_battle_screen.dart';
 import 'games/roulette_screen.dart';
+import 'games/ten_out_of_ten_screen.dart';
 import 'games/truth_or_dare_screen.dart';
+import 'games/werewolf_screen.dart';
 import 'games/word_race_screen.dart';
 import 'impostor/impostor_flow_screen.dart';
 import 'shared/team_setup_screen.dart';
@@ -90,6 +94,10 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
       GamePlayKind.roulette => RouletteScreen(players: players),
       GamePlayKind.liar => LiarScreen(players: players),
       GamePlayKind.fakeFact => FakeFactScreen(players: players),
+      GamePlayKind.werewolf => WerewolfScreen(players: players),
+      GamePlayKind.hundredQuestions => HundredQuestionsScreen(players: players),
+      GamePlayKind.tenOutOfTen => TenOutOfTenScreen(players: players),
+      GamePlayKind.circa => CircaScreen(players: players),
       // Team kinds never reach this branch — they route through TeamSetupScreen.
       GamePlayKind.charade ||
       GamePlayKind.taboo ||

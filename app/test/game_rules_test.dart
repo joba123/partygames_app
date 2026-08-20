@@ -210,7 +210,10 @@ void main() {
           );
 
       final first = onScreen();
-      await tester.tap(find.text(first.correctAnswer));
+      // Scope the tap to the answer button: several options are bare numbers
+      // that also appear in the scoreboard above, and a raw text finder would
+      // match both.
+      await tester.tap(find.widgetWithText(InkWell, first.correctAnswer));
       await tester.pump();
       expect(teams[0].score, 1);
 
@@ -219,7 +222,7 @@ void main() {
 
       final second = onScreen();
       final wrong = second.options.firstWhere((o) => o != second.correctAnswer);
-      await tester.tap(find.text(wrong));
+      await tester.tap(find.widgetWithText(InkWell, wrong));
       await tester.pump();
       expect(teams[1].score, 0);
 

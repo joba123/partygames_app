@@ -15,6 +15,10 @@ enum GameId {
   findeDenLuegner,
   fakeOderFakt,
   betBuddy,
+  werwoelfe,
+  hundertFragen,
+  zehnVonZehn,
+  circa,
 }
 
 /// Which screen a game opens once the roster is set. Every entry has a real
@@ -35,6 +39,10 @@ enum GamePlayKind {
   liar,
   fakeFact,
   bet,
+  werewolf,
+  hundredQuestions,
+  tenOutOfTen,
+  circa,
 }
 
 class GameInfo {
@@ -204,6 +212,47 @@ const games = <GameInfo>[
     playKind: GamePlayKind.bet,
     minPlayers: 4,
     needsTeams: true,
+  ),
+  GameInfo(
+    id: GameId.werwoelfe,
+    title: 'Werwölfe',
+    category: GameCategory.klassiker,
+    icon: GameIconType.werewolf,
+    description: 'Nachts frisst das Dorf sich selbst.',
+    meta: '5–16 SPIELER · 20 MIN',
+    playKind: GamePlayKind.werewolf,
+    minPlayers: 5,
+    badge: 'KULT',
+  ),
+  GameInfo(
+    id: GameId.hundertFragen,
+    title: '100 Fragen',
+    category: GameCategory.redenUndRaten,
+    icon: GameIconType.hundredQuestions,
+    description: 'Ehrliche Fragen, echte Gespräche.',
+    meta: '3–12 SPIELER · OFFEN',
+    playKind: GamePlayKind.hundredQuestions,
+    minPlayers: 3,
+  ),
+  GameInfo(
+    id: GameId.zehnVonZehn,
+    title: 'Er/Sie ist eine 10/10',
+    category: GameCategory.neu,
+    icon: GameIconType.tenOutOfTen,
+    description: 'Satz zu Ende bringen, Ruf ruinieren.',
+    meta: '3–12 SPIELER · SCHNELL',
+    playKind: GamePlayKind.tenOutOfTen,
+    minPlayers: 3,
+  ),
+  GameInfo(
+    id: GameId.circa,
+    title: 'Circa',
+    category: GameCategory.neu,
+    icon: GameIconType.circa,
+    description: 'Schätzen. Näher dran gewinnt.',
+    meta: '3–12 SPIELER · SCHNELL',
+    playKind: GamePlayKind.circa,
+    minPlayers: 3,
   ),
 ];
 
