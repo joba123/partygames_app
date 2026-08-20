@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/games.dart';
+import '../models/player.dart';
 import '../state/app_state.dart';
 import '../theme/app_palette.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text.dart';
 import '../widgets/buttons.dart';
 import '../widgets/player_list_tile.dart';
+import '../models/team.dart';
+import 'games/bomb_screen.dart';
+import 'games/never_have_i_ever_screen.dart';
+import 'games/point_vote_screen.dart';
+import 'games/quiz_battle_screen.dart';
+import 'games/roulette_screen.dart';
+import 'games/truth_or_dare_screen.dart';
+import 'games/word_race_screen.dart';
 import 'impostor/impostor_flow_screen.dart';
-import 'generic/prompt_demo_screen.dart';
-import 'generic/timer_demo_screen.dart';
+import 'shared/team_setup_screen.dart';
 
 /// Screen 03 — shared player-setup module for every game. Names persist
 /// across games (kept in [AppState]). `game == null` opens it in
@@ -51,27 +59,54 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
       Navigator.of(context).pop();
       return;
     }
-    switch (game.playKind) {
-      case GamePlayKind.impostor:
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => ImpostorFlowScreen(players: List.of(appState.players)),
-        ));
-        break;
-      case GamePlayKind.timerDemo:
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => TimerDemoScreen(game: game)));
-        break;
-      case GamePlayKind.promptDemo:
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => PromptDemoScreen(game: game, players: appState.players)));
-        break;
-    }
+    appState.markPlayed(game.id);
+    final players = List.of(appState.players);
+
+    // Team games get one more setup step; everything else starts right away.
+    final route = game.needsTeams
+        ? MaterialPageRoute<void>(
+            builder: (_) => TeamSetupScreen(
+              game: game,
+              players: players,
+              gameBuilder: (teams) => _teamGame(game, teams),
+            ),
+          )
+        : MaterialPageRoute<void>(builder: (_) => _soloGame(game, players));
+
+    Navigator.of(context).push(route);
+  }
+
+  Widget _soloGame(GameInfo game, List<Player> players) {
+    return switch (game.playKind) {
+      GamePlayKind.impostor => ImpostorFlowScreen(players: players),
+      GamePlayKind.truthOrDare => TruthOrDareScreen(game: game, players: players),
+      GamePlayKind.neverHaveIEver => NeverHaveIEverScreen(players: players),
+      GamePlayKind.pointVote => PointVoteScreen(players: players, mode: PointVoteMode.everyone),
+      GamePlayKind.duel => PointVoteScreen(players: players, mode: PointVoteMode.duel),
+      GamePlayKind.bomb => BombScreen(players: players),
+      GamePlayKind.roulette => RouletteScreen(players: players),
+      // Team kinds never reach this branch — they route through TeamSetupScreen.
+      GamePlayKind.charade || GamePlayKind.taboo || GamePlayKind.quiz => const SizedBox.shrink(),
+    };
+  }
+
+  Widget _teamGame(GameInfo game, List<Team> teams) {
+    return switch (game.playKind) {
+      GamePlayKind.charade => WordRaceScreen(teams: teams, variant: WordRaceVariant.charade),
+      GamePlayKind.taboo => WordRaceScreen(teams: teams, variant: WordRaceVariant.taboo),
+      GamePlayKind.quiz => QuizBattleScreen(teams: teams),
+      _ => const SizedBox.shrink(),
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
     final appState = context.watch<AppState>();
-    final canContinue = appState.players.length >= 3;
     final game = widget.game;
+    final minPlayers = game?.minPlayers ?? 3;
+    final missing = minPlayers - appState.players.length;
+    final canContinue = missing <= 0;
 
     return Scaffold(
       body: SafeArea(
@@ -92,7 +127,8 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
                   const SizedBox(height: 14),
                   Text('Wer spielt mit?', style: AppText.headline(p.textPrimary)),
                   const SizedBox(height: 6),
-                  Text('Mindestens 3. Namen bleiben für alle Spiele gespeichert.', style: AppText.bodySmall(p.textSecondary)),
+                  Text('Mindestens $minPlayers. Namen bleiben für alle Spiele gespeichert.',
+                      style: AppText.bodySmall(p.textSecondary)),
                 ],
               ),
             ),
@@ -192,15 +228,19 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
               child: Column(
                 children: [
                   AppButton(
-                    label: game == null
-                        ? 'Fertig'
-                        : (game.playKind == GamePlayKind.impostor ? 'Weiter zu den Rollen' : 'Weiter zum Spiel'),
+                    label: switch (game?.playKind) {
+                      null => 'Fertig',
+                      GamePlayKind.impostor => 'Weiter zu den Rollen',
+                      _ => game!.needsTeams ? 'Weiter zu den Teams' : 'Weiter zum Spiel',
+                    },
                     size: AppButtonSize.large,
                     onPressed: canContinue ? () => _continue(appState) : null,
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    canContinue ? (game == null ? '' : 'Handy wird gleich herumgegeben') : 'Noch ${3 - appState.players.length} Spieler nötig',
+                    canContinue
+                        ? (game == null ? '' : 'Handy wird gleich herumgegeben')
+                        : 'Noch $missing ${missing == 1 ? 'Spieler' : 'Spieler'} nötig',
                     style: AppText.caption(p.textFaint).copyWith(fontSize: 12),
                   ),
                 ],

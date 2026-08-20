@@ -6,8 +6,14 @@ import '../theme/app_spacing.dart';
 import '../theme/app_text.dart';
 import 'game_icons.dart';
 
-/// 2-column grid tile: icon top-left, title + category mono label pinned
-/// to the bottom — scannable without reading.
+/// Blends [accent] into [base] — used to derive every tinted surface from the
+/// one category colour, so a new category needs no new hand-picked hex codes.
+Color _tint(Color accent, Color base, double alpha) =>
+    Color.alphaBlend(accent.withValues(alpha: alpha), base);
+
+/// 2-column grid tile. The icon medallion carries the category colour and the
+/// game's own glyph, so a tile is recognisable before the label is read —
+/// which is the whole point when the phone is going round a dark room.
 class GameTile extends StatelessWidget {
   const GameTile({super.key, required this.game, this.onTap});
 
@@ -19,7 +25,7 @@ class GameTile extends StatelessWidget {
     final p = context.palette;
     final brightness = Theme.of(context).brightness;
     final accent = AppColors.category(game.category, brightness);
-    final tint = AppColors.categoryTint(game.category, brightness);
+    final dark = brightness == Brightness.dark;
 
     return Material(
       color: p.surface,
@@ -27,28 +33,76 @@ class GameTile extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.card),
         onTap: onTap,
-        child: Container(
-          height: 150,
-          padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Ink(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadius.card),
             border: Border.all(color: p.outlineVariant),
+            // A faint wash from the icon corner gives every category its own
+            // temperature without shouting.
+            gradient: RadialGradient(
+              center: const Alignment(-0.85, -0.95),
+              radius: 1.5,
+              colors: [
+                _tint(accent, p.surface, dark ? 0.13 : 0.10),
+                p.surface,
+              ],
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(14)),
-                alignment: Alignment.center,
-                child: GameIconGlyph(type: game.icon, color: accent, size: 22),
-              ),
-              const Spacer(),
-              Text(game.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppText.title(p.textPrimary).copyWith(fontSize: 15, height: 1.2)),
-              const SizedBox(height: 4),
-              Text(game.category.label.toUpperCase(), style: AppText.labelMono(p.textFaint, size: 9)),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _IconMedallion(icon: game.icon, accent: accent, base: p.surface, size: 54, glyphSize: 27),
+                    const Spacer(),
+                    if (game.badge != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                        decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(999)),
+                        child: Text(
+                          game.badge!,
+                          style: AppText.labelMono(
+                            dark ? AppColors.darkBackground : Colors.white,
+                            size: 8,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const Spacer(),
+                Text(
+                  game.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppText.title(p.textPrimary).copyWith(fontSize: 16, height: 1.15),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  game.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppText.caption(p.textMuted).copyWith(fontSize: 12, height: 1.3),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Container(width: 6, height: 6, decoration: BoxDecoration(color: accent, shape: BoxShape.circle)),
+                    const SizedBox(width: 7),
+                    Expanded(
+                      child: Text(
+                        game.category.label.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppText.labelMono(p.textFaint, size: 9),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -56,7 +110,46 @@ class GameTile extends StatelessWidget {
   }
 }
 
-/// Full-width hero card for the most-recently-played game.
+/// Rounded icon plate. Shared by the tile and the hero card so the glyph sits
+/// in the same frame at both sizes.
+class _IconMedallion extends StatelessWidget {
+  const _IconMedallion({
+    required this.icon,
+    required this.accent,
+    required this.base,
+    required this.size,
+    required this.glyphSize,
+  });
+
+  final GameIconType icon;
+  final Color accent;
+  final Color base;
+  final double size;
+  final double glyphSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size * 0.32),
+        border: Border.all(color: accent.withValues(alpha: 0.32)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_tint(accent, base, 0.26), _tint(accent, base, 0.10)],
+        ),
+      ),
+      alignment: Alignment.center,
+      child: GameIconGlyph(type: icon, color: accent, size: glyphSize),
+    );
+  }
+}
+
+/// Full-width hero card for the most-recently-played game. Takes its colour
+/// from the game's own category instead of a fixed orange, so featuring a
+/// different game actually looks different.
 class HeroGameCard extends StatelessWidget {
   const HeroGameCard({super.key, required this.game, this.onTap});
 
@@ -66,13 +159,9 @@ class HeroGameCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final accent = AppColors.category(game.category, Theme.of(context).brightness);
-
-    final gradient = dark
-        ? const LinearGradient(colors: [Color(0xFF3A2321), Color(0xFF241817)], begin: Alignment.topLeft, end: Alignment.bottomRight)
-        : const LinearGradient(colors: [Color(0xFFFFE6D6), Color(0xFFFFF1E7)], begin: Alignment.topLeft, end: Alignment.bottomRight);
-    final borderColor = dark ? const Color(0xFF4A302C) : const Color(0xFFF0D3C0);
+    final brightness = Theme.of(context).brightness;
+    final dark = brightness == Brightness.dark;
+    final accent = AppColors.category(game.category, brightness);
 
     return Material(
       color: Colors.transparent,
@@ -80,49 +169,67 @@ class HeroGameCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.card),
         onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Ink(
           decoration: BoxDecoration(
-            gradient: gradient,
             borderRadius: BorderRadius.circular(AppRadius.card),
-            border: Border.all(color: borderColor),
+            border: Border.all(color: accent.withValues(alpha: dark ? 0.38 : 0.30)),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: dark
+                  ? [_tint(accent, p.surface, 0.22), _tint(accent, p.background, 0.07)]
+                  : [_tint(accent, Colors.white, 0.18), _tint(accent, Colors.white, 0.05)],
+            ),
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(color: p.surface, borderRadius: BorderRadius.circular(18)),
-                alignment: Alignment.center,
-                child: GameIconGlyph(type: game.icon, color: accent, size: 28),
-              ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(child: Text(game.title, style: AppText.title(p.textPrimary).copyWith(fontSize: 20, height: 1.15))),
-                        if (game.badge != null) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(color: p.primary.withValues(alpha: dark ? 1 : 1), borderRadius: BorderRadius.circular(999)),
-                            child: Text(game.badge!, style: AppText.labelMono(p.onPrimary, size: 9)),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Text(game.description, style: AppText.caption(p.textSecondary)),
-                    const SizedBox(height: 5),
-                    Text(game.meta, style: AppText.labelMono(p.textMuted, size: 10)),
-                  ],
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Row(
+              children: [
+                _IconMedallion(
+                  icon: game.icon,
+                  accent: accent,
+                  base: p.surface,
+                  size: 64,
+                  glyphSize: 32,
                 ),
-              ),
-            ],
+                const SizedBox(width: AppSpacing.lg),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              game.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppText.title(p.textPrimary).copyWith(fontSize: 20, height: 1.15),
+                            ),
+                          ),
+                          if (game.badge != null) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(999)),
+                              child: Text(
+                                game.badge!,
+                                style: AppText.labelMono(dark ? AppColors.darkBackground : Colors.white, size: 9),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Text(game.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppText.caption(p.textSecondary)),
+                      const SizedBox(height: 5),
+                      Text(game.meta, style: AppText.labelMono(p.textMuted, size: 10)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

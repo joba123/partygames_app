@@ -1,0 +1,68 @@
+import 'content.dart';
+
+/// Bombe — the holder names one thing from the category and passes on.
+/// Short, unambiguous, and endless enough that a round never stalls.
+const bombCategories = <Prompt>[
+  Prompt('Städte mit mehr als 100.000 Einwohnern'),
+  Prompt('Dinge in einem Kühlschrank'),
+  Prompt('Automarken'),
+  Prompt('Filme mit einer Zahl im Titel'),
+  Prompt('Tiere, die schwimmen können'),
+  Prompt('Berufe ohne Büro'),
+  Prompt('Dinge, die man verlieren kann'),
+  Prompt('Serien, die länger als drei Staffeln laufen'),
+  Prompt('Wörter mit Doppelbuchstaben'),
+  Prompt('Sportarten mit Ball'),
+  Prompt('Dinge in einer Handtasche'),
+  Prompt('Länder in Europa'),
+  Prompt('Musikinstrumente'),
+  Prompt('Gerichte mit Kartoffeln'),
+  Prompt('Dinge, die piepsen'),
+  Prompt('Marken von Turnschuhen'),
+  Prompt('Comic- und Zeichentrickfiguren'),
+  Prompt('Dinge, die man im Winter braucht'),
+  Prompt('Wörter, die auf "-ung" enden'),
+  Prompt('Farben, die kein Grundfarbton sind'),
+  Prompt('Dinge, die in eine Hosentasche passen'),
+  Prompt('Gründe, zu spät zu kommen'),
+  Prompt('Dinge auf einem Schreibtisch'),
+  Prompt('Deutsche Bands'),
+  Prompt('Dinge, die man nicht waschen kann'),
+  Prompt('Superkräfte'),
+  Prompt('Dinge, die man einem Kind erklären muss'),
+  Prompt('Getränke ohne Alkohol'),
+  Prompt('Wörter, die es nur im Deutschen gibt'),
+  Prompt('Dinge, die man an einem Bahnhof sieht'),
+];
+
+/// Trinkspiel-Roulette — a rule plus a randomly picked target. Everything
+/// alcoholic is flagged so the "Alkoholfrei" switch leaves a playable
+/// non-drinking variant of the same game behind.
+const rouletteRules = <Prompt>[
+  Prompt('%s verteilt drei Schlucke.', alcohol: true),
+  Prompt('%s trinkt zwei Schlucke.', alcohol: true),
+  Prompt('Alle außer %s trinken.', alcohol: true),
+  Prompt('%s und die Person rechts daneben trinken gemeinsam.', alcohol: true),
+  Prompt('%s erfindet eine Regel, die bis zur nächsten Runde gilt.'),
+  Prompt('%s darf die nächste Runde nicht lachen.'),
+  Prompt('%s darf ab jetzt niemanden mehr beim Namen nennen.'),
+  Prompt('%s beantwortet eine Frage der Gruppe ehrlich.'),
+  Prompt('%s macht zehn Kniebeugen.'),
+  Prompt('%s bestimmt, wer die nächste Runde startet.'),
+  Prompt('%s darf eine Person auswählen, die eine Runde aussetzt.'),
+  Prompt('%s muss bis zur nächsten Runde stehen bleiben.'),
+  Prompt('%s erzählt in 20 Sekunden eine Anekdote.'),
+  Prompt('%s tauscht den Platz mit der Person gegenüber.'),
+  Prompt('%s darf ab jetzt nur noch flüstern.'),
+  Prompt('%s wählt einen Partner — ab jetzt teilt ihr euch jede Aufgabe.'),
+  Prompt('%s macht eine Person aus der Runde nach.'),
+  Prompt('%s bekommt einen neuen Namen für den Abend.'),
+  Prompt('%s trinkt für jede Person, die heute schon zu spät kam.', alcohol: true),
+  Prompt('%s darf einen Schluck an jemanden weitergeben.', alcohol: true),
+  Prompt('%s nennt drei Dinge, die er an der Person links mag.', spice: Spice.flirty),
+  Prompt('%s schreibt der zuletzt kontaktierten Person "Ich muss dir was sagen".', spice: Spice.flirty),
+  Prompt('%s beantwortet die nächste Frage nur mit Ja oder Nein.'),
+  Prompt('%s erzählt seinen peinlichsten Moment des Jahres.', spice: Spice.fuerMutige),
+  Prompt('%s gibt der Gruppe sein Handy für eine Frage.', spice: Spice.fuerMutige),
+  Prompt('%s darf jemanden aus der Runde eine Runde lang komplett ignorieren.', spice: Spice.fuerMutige, premium: true),
+];

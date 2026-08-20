@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../data/content.dart';
+import '../data/games.dart';
 import '../models/player.dart';
 import '../theme/app_colors.dart';
 
@@ -24,12 +26,35 @@ class AppState extends ChangeNotifier {
 
   GameCategory? hubFilter;
 
+  /// Drives the Hub's hero card. Starts on Impostor so a fresh install still
+  /// has something featured.
+  GameId lastPlayed = GameId.impostor;
+
   final Map<ContentCategory, bool> contentCategories = {
     ContentCategory.harmlos: true,
     ContentCategory.flirty: true,
     ContentCategory.fuerMutige: false,
     ContentCategory.alkoholfrei: false,
   };
+
+  /// The card filter the settings screen actually describes: the three spice
+  /// toggles decide what may appear, "Alkoholfrei" removes drinking cards,
+  /// and Plus unlocks the premium pool.
+  ContentFilter get contentFilter => ContentFilter(
+        spices: {
+          if (contentCategories[ContentCategory.harmlos] ?? false) Spice.harmlos,
+          if (contentCategories[ContentCategory.flirty] ?? false) Spice.flirty,
+          if (contentCategories[ContentCategory.fuerMutige] ?? false) Spice.fuerMutige,
+        },
+        noAlcohol: contentCategories[ContentCategory.alkoholfrei] ?? false,
+        premium: isPremium,
+      );
+
+  void markPlayed(GameId id) {
+    if (lastPlayed == id) return;
+    lastPlayed = id;
+    notifyListeners();
+  }
 
   ThemeMode get themeMode => switch (designMode) {
         DesignMode.dark => ThemeMode.dark,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../data/card_counts.dart';
 import '../state/app_state.dart';
 import '../theme/app_palette.dart';
 import '../theme/app_spacing.dart';
@@ -127,10 +128,12 @@ class SettingsScreen extends StatelessWidget {
                         Container(width: 8, height: 8, decoration: BoxDecoration(color: p.primary, shape: BoxShape.circle)),
                         const SizedBox(width: 14),
                         Expanded(
-                          child: Text(appState.isPremium ? '1160 Karten aktiv' : '840 Karten aktiv',
+                          child: Text('${activeCardCount(appState.contentFilter)} Karten aktiv',
                               style: AppText.nameLabel(p.textSecondary)),
                         ),
-                        if (!appState.isPremium) Text('+320 MIT PLUS', style: AppText.labelMono(p.primary, size: 12)),
+                        if (!appState.isPremium)
+                          Text('+${lockedPremiumCardCount(appState.contentFilter)} MIT PLUS',
+                              style: AppText.labelMono(p.primary, size: 12)),
                       ],
                     ),
                   ),

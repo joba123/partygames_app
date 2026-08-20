@@ -32,9 +32,9 @@ class _HubScreenState extends State<HubScreen> {
   Widget build(BuildContext context) {
     final p = context.palette;
     final appState = context.watch<AppState>();
-    final hero = games.first;
+    final hero = gameById(appState.lastPlayed);
     final filter = appState.hubFilter;
-    final rest = games.skip(1).where((g) => filter == null || g.category == filter).toList();
+    final rest = games.where((g) => g.id != hero.id && (filter == null || g.category == filter)).toList();
 
     return Scaffold(
       body: SafeArea(
@@ -94,7 +94,7 @@ class _HubScreenState extends State<HubScreen> {
                       crossAxisCount: 2,
                       mainAxisSpacing: AppSpacing.cardGap,
                       crossAxisSpacing: AppSpacing.cardGap,
-                      mainAxisExtent: 150,
+                      mainAxisExtent: 194,
                     ),
                     itemBuilder: (context, i) => GameTile(game: rest[i], onTap: () => _openGame(rest[i])),
                   ),
