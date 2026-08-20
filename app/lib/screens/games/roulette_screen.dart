@@ -150,7 +150,7 @@ class _RouletteScreenState extends State<RouletteScreen> with SingleTickerProvid
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     if (showResult) ...[
-                      Text(widget.players[_targetIndex!].name.toUpperCase(),
+                      Text(germanUpper(widget.players[_targetIndex!].name),
                           style: AppText.labelMono(p.warning, size: 12)),
                       const SizedBox(height: 12),
                       Container(

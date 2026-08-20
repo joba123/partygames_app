@@ -252,7 +252,7 @@ class _WordRaceScreenState extends State<WordRaceScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(_team.name.toUpperCase(), style: AppText.labelMono(accent, size: 12)),
+            Text(germanUpper(_team.name), style: AppText.labelMono(accent, size: 12)),
             const SizedBox(height: 14),
             Text(
               explainer == null ? 'Team ist dran' : '${explainer.name} ${_isTaboo ? 'erklärt' : 'spielt vor'}',
@@ -402,7 +402,7 @@ class _ScoreLine extends StatelessWidget {
             children: [
               Text('${teams[i].score}', style: AppText.monoDisplay(p.textPrimary, size: 34)),
               const SizedBox(height: 6),
-              Text(teams[i].name.toUpperCase(),
+              Text(germanUpper(teams[i].name),
                   style: AppText.labelMono(i == 0 ? p.danger : p.secondary, size: 10)),
             ],
           ),

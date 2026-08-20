@@ -81,7 +81,7 @@ class ImpostorResolutionScreen extends StatelessWidget {
                           _InfoRow(label: 'DAS WORT WAR', value: session.word, valueColor: p.accentSafe),
                           Divider(color: p.outlineVariant, height: 25),
                           if (session.impostorGuess != null && session.impostorGuess!.trim().isNotEmpty) ...[
-                            _InfoRow(label: '${session.impostor.name.toUpperCase()} TIPPTE AUF', value: '„${session.impostorGuess}"', valueColor: p.textPrimary),
+                            _InfoRow(label: '${germanUpper(session.impostor.name)} TIPPTE AUF', value: '„${session.impostorGuess}"', valueColor: p.textPrimary),
                             Divider(color: p.outlineVariant, height: 25),
                           ],
                           _InfoRow(

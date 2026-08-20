@@ -12,6 +12,9 @@ enum GameId {
   mostLikelyToDuell,
   quizBattle,
   tabu,
+  findeDenLuegner,
+  fakeOderFakt,
+  betBuddy,
 }
 
 /// Which screen a game opens once the roster is set. Every entry has a real
@@ -29,6 +32,9 @@ enum GamePlayKind {
   charade,
   taboo,
   quiz,
+  liar,
+  fakeFact,
+  bet,
 }
 
 class GameInfo {
@@ -164,6 +170,38 @@ const games = <GameInfo>[
     description: 'Erklären ohne die Reizwörter.',
     meta: '4–14 SPIELER · TEAMS',
     playKind: GamePlayKind.taboo,
+    minPlayers: 4,
+    needsTeams: true,
+  ),
+  GameInfo(
+    id: GameId.findeDenLuegner,
+    title: 'Finde den Lügner',
+    category: GameCategory.redenUndRaten,
+    icon: GameIconType.liar,
+    description: 'Einer beantwortet eine andere Frage.',
+    meta: '3–12 SPIELER · 10 MIN',
+    playKind: GamePlayKind.liar,
+    minPlayers: 3,
+    badge: 'NEU',
+  ),
+  GameInfo(
+    id: GameId.fakeOderFakt,
+    title: 'Fake oder Fakt',
+    category: GameCategory.neu,
+    icon: GameIconType.fakeFact,
+    description: 'Einer erfindet seinen Fakt.',
+    meta: '3–12 SPIELER · 10 MIN',
+    playKind: GamePlayKind.fakeFact,
+    minPlayers: 3,
+  ),
+  GameInfo(
+    id: GameId.betBuddy,
+    title: 'Bet Buddy',
+    category: GameCategory.schnell,
+    icon: GameIconType.bet,
+    description: 'Hochbieten, bis einer liefern muss.',
+    meta: '4–16 SPIELER · TEAMS',
+    playKind: GamePlayKind.bet,
     minPlayers: 4,
     needsTeams: true,
   ),

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// Uppercase for the mono labels. Dart's [String.toUpperCase] leaves ß as-is,
+/// which renders "FUßBALL" — German typography wants SS there.
+String germanUpper(String value) => value.replaceAll('ß', 'ss').toUpperCase();
+
 /// Type scale from the handoff: Space Grotesk for everything spoken,
 /// JetBrains Mono for counters/timers/role-codes/labels.
 /// Body never below 15px, in-game content 24–44px.

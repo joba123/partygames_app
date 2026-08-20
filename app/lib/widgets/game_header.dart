@@ -32,7 +32,7 @@ class GameHeader extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                status.toUpperCase(),
+                germanUpper(status),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -47,7 +47,7 @@ class GameHeader extends StatelessWidget {
                 color: accent.withValues(alpha: .14),
                 borderRadius: BorderRadius.circular(999),
               ),
-              child: Text(trailingLabel!.toUpperCase(), style: AppText.labelMono(accent, size: 11)),
+              child: Text(germanUpper(trailingLabel!), style: AppText.labelMono(accent, size: 11)),
             )
           else
             const SizedBox(width: 44),

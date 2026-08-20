@@ -9,7 +9,10 @@ import '../theme/app_text.dart';
 import '../widgets/buttons.dart';
 import '../widgets/player_list_tile.dart';
 import '../models/team.dart';
+import 'games/bet_buddy_screen.dart';
 import 'games/bomb_screen.dart';
+import 'games/fake_fact_screen.dart';
+import 'games/liar_screen.dart';
 import 'games/never_have_i_ever_screen.dart';
 import 'games/point_vote_screen.dart';
 import 'games/quiz_battle_screen.dart';
@@ -85,8 +88,14 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
       GamePlayKind.duel => PointVoteScreen(players: players, mode: PointVoteMode.duel),
       GamePlayKind.bomb => BombScreen(players: players),
       GamePlayKind.roulette => RouletteScreen(players: players),
+      GamePlayKind.liar => LiarScreen(players: players),
+      GamePlayKind.fakeFact => FakeFactScreen(players: players),
       // Team kinds never reach this branch — they route through TeamSetupScreen.
-      GamePlayKind.charade || GamePlayKind.taboo || GamePlayKind.quiz => const SizedBox.shrink(),
+      GamePlayKind.charade ||
+      GamePlayKind.taboo ||
+      GamePlayKind.quiz ||
+      GamePlayKind.bet =>
+        const SizedBox.shrink(),
     };
   }
 
@@ -95,6 +104,7 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
       GamePlayKind.charade => WordRaceScreen(teams: teams, variant: WordRaceVariant.charade),
       GamePlayKind.taboo => WordRaceScreen(teams: teams, variant: WordRaceVariant.taboo),
       GamePlayKind.quiz => QuizBattleScreen(teams: teams),
+      GamePlayKind.bet => BetBuddyScreen(teams: teams),
       _ => const SizedBox.shrink(),
     };
   }

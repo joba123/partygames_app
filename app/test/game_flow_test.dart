@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:imposter_party/data/games.dart';
+import 'package:imposter_party/screens/games/bet_buddy_screen.dart';
 import 'package:imposter_party/screens/games/bomb_screen.dart';
+import 'package:imposter_party/screens/games/fake_fact_screen.dart';
+import 'package:imposter_party/screens/games/liar_screen.dart';
 import 'package:imposter_party/screens/games/never_have_i_ever_screen.dart';
 import 'package:imposter_party/screens/games/point_vote_screen.dart';
 import 'package:imposter_party/screens/games/quiz_battle_screen.dart';
@@ -28,6 +31,9 @@ const _expectedScreen = <GamePlayKind, Type>{
   GamePlayKind.charade: WordRaceScreen,
   GamePlayKind.taboo: WordRaceScreen,
   GamePlayKind.quiz: QuizBattleScreen,
+  GamePlayKind.liar: LiarScreen,
+  GamePlayKind.fakeFact: FakeFactScreen,
+  GamePlayKind.bet: BetBuddyScreen,
 };
 
 void main() {

@@ -110,7 +110,7 @@ class GameResultScreen extends StatelessWidget {
                         const SizedBox(width: 10),
                         Text('${e.score}', style: AppText.monoValue(p.textPrimary, size: 22, weight: FontWeight.w700)),
                         const SizedBox(width: 6),
-                        Text(scoreUnit.toUpperCase(), style: AppText.labelMono(p.textFaint, size: 10)),
+                        Text(germanUpper(scoreUnit), style: AppText.labelMono(p.textFaint, size: 10)),
                       ],
                     ),
                   );

@@ -126,7 +126,7 @@ class _QuizBattleScreenState extends State<QuizBattleScreen> {
                           children: [
                             Text('${widget.teams[i].score}', style: AppText.monoDisplay(p.textPrimary, size: 30)),
                             const SizedBox(height: 4),
-                            Text(widget.teams[i].name.toUpperCase(),
+                            Text(germanUpper(widget.teams[i].name),
                                 style: AppText.labelMono(i == 0 ? p.danger : p.secondary, size: 10)),
                           ],
                         ),

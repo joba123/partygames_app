@@ -50,7 +50,7 @@ class PromptCardView extends StatelessWidget {
                 .map((c) => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(color: chipBg, borderRadius: BorderRadius.circular(999)),
-                      child: Text(c.toUpperCase(), style: AppText.labelMono(chipFg, size: 11)),
+                      child: Text(germanUpper(c), style: AppText.labelMono(chipFg, size: 11)),
                     ))
                 .toList(),
           ),

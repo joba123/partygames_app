@@ -93,7 +93,7 @@ class GameTile extends StatelessWidget {
                     const SizedBox(width: 7),
                     Expanded(
                       child: Text(
-                        game.category.label.toUpperCase(),
+                        germanUpper(game.category.label),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppText.labelMono(p.textFaint, size: 9),

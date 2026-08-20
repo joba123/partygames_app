@@ -17,6 +17,9 @@ enum GameIconType {
   duel,
   quiz,
   taboo,
+  liar,
+  fakeFact,
+  bet,
 }
 
 class GameIconGlyph extends StatelessWidget {
@@ -199,6 +202,43 @@ class _GameIconPainter extends CustomPainter {
           ..lineTo(s * 0.5, s * 0.70);
         canvas.drawPath(hook, stroke);
         canvas.drawCircle(Offset(s * 0.5, s * 0.86), s * 0.065, fill);
+        break;
+
+      // Magnifier with someone caught in the lens.
+      case GameIconType.liar:
+        final lens = Offset(s * 0.42, s * 0.42);
+        canvas.drawCircle(lens, s * 0.30, stroke);
+        canvas.drawCircle(lens, s * 0.11, fill);
+        canvas.drawLine(Offset(s * 0.64, s * 0.64), Offset(s * 0.88, s * 0.88), stroke);
+        break;
+
+      // True next to false — the whole decision in one glyph.
+      case GameIconType.fakeFact:
+        final check = Path()
+          ..moveTo(s * 0.05, s * 0.52)
+          ..lineTo(s * 0.19, s * 0.68)
+          ..lineTo(s * 0.43, s * 0.30);
+        canvas.drawPath(check, stroke);
+        canvas.drawLine(Offset(s * 0.59, s * 0.32), Offset(s * 0.91, s * 0.68), stroke);
+        canvas.drawLine(Offset(s * 0.91, s * 0.32), Offset(s * 0.59, s * 0.68), stroke);
+        break;
+
+      // A stack of chips and the direction the bidding goes. The gaps have
+      // to stay wider than the stroke or the three rings merge into a blob.
+      case GameIconType.bet:
+        for (final y in const [0.82, 0.59, 0.36]) {
+          canvas.drawOval(
+            Rect.fromCenter(center: Offset(s * 0.33, s * y), width: s * 0.56, height: s * 0.15),
+            thin,
+          );
+        }
+        final arrow = Path()
+          ..moveTo(s * 0.82, s * 0.80)
+          ..lineTo(s * 0.82, s * 0.22)
+          ..moveTo(s * 0.71, s * 0.35)
+          ..lineTo(s * 0.82, s * 0.20)
+          ..lineTo(s * 0.93, s * 0.35);
+        canvas.drawPath(arrow, stroke);
         break;
 
       // Speech bubble, struck through — the words you may not say.

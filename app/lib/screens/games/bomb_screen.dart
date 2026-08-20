@@ -267,7 +267,7 @@ class _BombScreenState extends State<BombScreen> with SingleTickerProviderStateM
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
-          Text(_holder.name.toUpperCase(), style: AppText.labelMono(p.danger, size: 12)),
+          Text(germanUpper(_holder.name), style: AppText.labelMono(p.danger, size: 12)),
           const SizedBox(height: 10),
           Text(_category?.text ?? '', textAlign: TextAlign.center, style: AppText.headline(p.textPrimary)),
           const SizedBox(height: 14),

@@ -164,7 +164,7 @@ class _TeamCard extends StatelessWidget {
             children: [
               Container(width: 10, height: 10, decoration: BoxDecoration(color: accent, shape: BoxShape.circle)),
               const SizedBox(width: 10),
-              Text(title.toUpperCase(), style: AppText.labelMono(accent, size: 12)),
+              Text(germanUpper(title), style: AppText.labelMono(accent, size: 12)),
               const Spacer(),
               Text('${members.length}', style: AppText.monoValue(p.textFaint, size: 13)),
             ],

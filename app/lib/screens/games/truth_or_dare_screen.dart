@@ -150,7 +150,7 @@ class _TruthOrDareScreenState extends State<TruthOrDareScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('${_current.name.toUpperCase()}, DU BIST DRAN', style: AppText.labelMono(p.textMuted, size: 12)),
+          Text('${germanUpper(_current.name)}, DU BIST DRAN', style: AppText.labelMono(p.textMuted, size: 12)),
           const SizedBox(height: 18),
           Text('Wahrheit\noder Pflicht?', textAlign: TextAlign.center, style: AppText.display(p.textPrimary)),
           const SizedBox(height: 18),
