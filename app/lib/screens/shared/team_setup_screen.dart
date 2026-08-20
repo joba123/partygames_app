@@ -13,7 +13,16 @@ import '../../widgets/game_header.dart';
 /// tapping a player moves them across, because in practice the group always
 /// wants to fix exactly one placement.
 class TeamSetupScreen extends StatefulWidget {
-  const TeamSetupScreen({super.key, required this.game, required this.players, required this.gameBuilder});
+  const TeamSetupScreen({
+    super.key,
+    required this.game,
+    required this.players,
+    required this.gameBuilder,
+    this.stepLabel = 'Schritt 2 von 2',
+  });
+
+  /// e.g. "Schritt 3 von 3" once a category step precedes this one.
+  final String stepLabel;
 
   final GameInfo game;
   final List<Player> players;
@@ -68,7 +77,7 @@ class _TeamSetupScreenState extends State<TeamSetupScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            GameHeader(status: 'Schritt 2 von 2 · ${widget.game.title}'),
+            GameHeader(status: '${widget.stepLabel} · ${widget.game.title}'),
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenPadding, 6, AppSpacing.screenPadding, 0),
               child: Column(

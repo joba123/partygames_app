@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../data/card_counts.dart';
+import '../monetization/purchase_gateway.dart';
 import '../state/app_state.dart';
 import '../theme/app_palette.dart';
 import '../theme/app_spacing.dart';
@@ -37,14 +39,31 @@ class PremiumScreen extends StatelessWidget {
                   const SizedBox(height: 14),
                   Text('Imposter Plus', style: AppText.headline(p.textPrimary)),
                   const SizedBox(height: 8),
-                  Text('Alles Wichtige bleibt gratis. Plus ist für Runden, die nicht aufhören wollen.',
+                  Text('Alles Wichtige bleibt gratis. Pro ist für Runden, die nicht aufhören wollen.',
                       style: AppText.bodySmall(p.textSecondary)),
                   const SizedBox(height: 22),
-                  const _FeatureRow(icon: Icons.crop_square_rounded, color: Color(0xFFFFC49B), title: '+320 Karten', subtitle: 'In allen Kategorien, monatlich neu'),
+                  // Only things Pro actually does today — a paywall that
+                  // promises features the build does not have earns refunds.
+                  _FeatureRow(
+                    icon: Icons.block_rounded,
+                    color: const Color(0xFF9BE8D8),
+                    title: 'Keine Hinweise mehr',
+                    subtitle: 'Der Abend läuft ohne Unterbrechung durch',
+                  ),
                   const SizedBox(height: 10),
-                  const _FeatureRow(icon: Icons.circle_outlined, color: Color(0xFFE5B6F2), title: 'Eigene Karten', subtitle: 'Inside-Jokes ins Deck werfen'),
+                  _FeatureRow(
+                    icon: Icons.local_fire_department_rounded,
+                    color: const Color(0xFFFF8A7A),
+                    title: '„Für Mutige" freigeschaltet',
+                    subtitle: 'In jedem Modus wählbar, 18+',
+                  ),
                   const SizedBox(height: 10),
-                  const _FeatureRow(icon: Icons.change_history_rounded, color: Color(0xFF9BE8D8), title: 'Statistiken der Gruppe', subtitle: 'Wer wird am häufigsten erwischt?'),
+                  _FeatureRow(
+                    icon: Icons.style_rounded,
+                    color: const Color(0xFFFFC49B),
+                    title: '+${lockedPremiumCardCount(appState.contentFilter)} Bonuskarten',
+                    subtitle: 'Verteilt über alle Decks',
+                  ),
                   const SizedBox(height: 22),
                   IntrinsicHeight(
                     child: Row(
@@ -120,16 +139,31 @@ class PremiumScreen extends StatelessWidget {
                     size: AppButtonSize.large,
                     onPressed: appState.isPremium
                         ? null
-                        : () {
-                            appState.unlockPremium();
-                            Navigator.of(context).pop();
+                        : () async {
+                            final navigator = Navigator.of(context);
+                            await LocalUnlockGateway(appState).buyLifetime();
+                            navigator.pop();
                           },
                   ),
                   const SizedBox(height: 12),
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Text('Später — erstmal weiterspielen', style: AppText.caption(p.textFaint)),
-                  ),
+                  if (!appState.isPremium)
+                    GestureDetector(
+                      onTap: () async {
+                        final messenger = ScaffoldMessenger.of(context);
+                        final restored = await LocalUnlockGateway(appState).restore();
+                        if (!restored) {
+                          messenger.showSnackBar(
+                            const SnackBar(content: Text('Kein früherer Kauf gefunden.')),
+                          );
+                        }
+                      },
+                      child: Text('Käufe wiederherstellen', style: AppText.caption(p.textFaint)),
+                    )
+                  else
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Text('Später — erstmal weiterspielen', style: AppText.caption(p.textFaint)),
+                    ),
                 ],
               ),
             ),

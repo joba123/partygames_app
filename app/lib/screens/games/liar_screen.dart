@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../data/deck.dart';
 import '../../data/liar_questions.dart';
 import '../../models/player.dart';
+import '../../state/app_state.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_text.dart';
@@ -100,6 +102,8 @@ class _LiarScreenState extends State<LiarScreen> {
       }
       _phase = _LiarPhase.resolution;
     });
+    // Resolving is the end of a round for the promo pacing.
+    context.read<AppState>().markRoundFinished();
   }
 
   void _nextRound() => setState(_startRound);

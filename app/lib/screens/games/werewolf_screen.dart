@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/player.dart';
 import '../../models/werewolf_round.dart';
+import '../../state/app_state.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_text.dart';
@@ -113,7 +115,12 @@ class _WerewolfScreenState extends State<WerewolfScreen> {
       _round.resolveNight();
       _phase = _round.outcome != null ? _WolfPhase.gameOver : _WolfPhase.dayVote;
     });
+    if (_phase == _WolfPhase.gameOver) _countRound();
   }
+
+  /// Werwölfe has no shared podium, so the round counter that paces the promo
+  /// and rating prompts has to be bumped here.
+  void _countRound() => context.read<AppState>().markRoundFinished();
 
   void _lynch() {
     final target = _selection;
@@ -127,11 +134,12 @@ class _WerewolfScreenState extends State<WerewolfScreen> {
   }
 
   void _nextNight() {
+    if (_round.outcome != null) {
+      _countRound();
+      setState(() => _phase = _WolfPhase.gameOver);
+      return;
+    }
     setState(() {
-      if (_round.outcome != null) {
-        _phase = _WolfPhase.gameOver;
-        return;
-      }
       _round.nextNight();
       _lynched = null;
       _phase = _WolfPhase.nightFalls;

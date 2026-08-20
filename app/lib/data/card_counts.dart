@@ -1,4 +1,6 @@
 import 'content.dart';
+import 'games.dart';
+import 'hundred_questions.dart';
 import 'prompts_rounds.dart';
 import 'prompts_social.dart';
 import 'prompts_truth_dare.dart';
@@ -16,7 +18,22 @@ const _allPrompts = <List<Prompt>>[
   duelPrompts,
   bombCategories,
   rouletteRules,
+  hundredQuestions,
+  tenOutOfTenOpeners,
 ];
+
+/// The spice-tagged pool behind one game, or empty for games whose content
+/// carries no rating — those never show the category picker.
+List<Prompt> poolForGame(GameId id) => switch (id) {
+      GameId.wahrheitOderPflicht => const [...truthPrompts, ...darePrompts],
+      GameId.werWuerdeEher => wouldRatherPrompts,
+      GameId.ichHabNochNie => neverHaveIEverPrompts,
+      GameId.mostLikelyToDuell => duelPrompts,
+      GameId.trinkspielRoulette => rouletteRules,
+      GameId.hundertFragen => hundredQuestions,
+      GameId.zehnVonZehn => tenOutOfTenOpeners,
+      _ => const [],
+    };
 
 /// Word and quiz cards carry no spice rating — they are always in play.
 final int _fixedCardCount = charadeWords.length + tabooWords.length + quizQuestions.length;

@@ -17,6 +17,7 @@ import 'package:imposter_party/screens/games/werewolf_screen.dart';
 import 'package:imposter_party/screens/games/word_race_screen.dart';
 import 'package:imposter_party/screens/impostor/impostor_flow_screen.dart';
 import 'package:imposter_party/screens/player_setup_screen.dart';
+import 'package:imposter_party/screens/shared/category_picker_screen.dart';
 import 'package:imposter_party/screens/shared/team_setup_screen.dart';
 import 'package:imposter_party/state/app_state.dart';
 
@@ -45,6 +46,8 @@ const _expectedScreen = <GamePlayKind, Type>{
 };
 
 void main() {
+  setUp(useFakePreferences);
+
   test('the catalogue has no unmapped play kind', () {
     expect(_expectedScreen.keys.toSet(), GamePlayKind.values.toSet());
     for (final game in games) {
@@ -69,6 +72,13 @@ void main() {
       expect(start, findsOneWidget, reason: 'no continue button on the setup screen');
       await tester.tap(start);
       await settleRoute(tester);
+
+      if (game.picksCategories) {
+        expect(find.byType(CategoryPickerScreen), findsOneWidget);
+        expect(find.text('Womit spielt ihr?'), findsOneWidget);
+        await tester.tap(find.text('Runde starten'));
+        await settleRoute(tester);
+      }
 
       if (game.needsTeams) {
         expect(find.byType(TeamSetupScreen), findsOneWidget);

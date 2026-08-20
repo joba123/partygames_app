@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../data/deck.dart';
 import '../../data/fact_cards.dart';
 import '../../models/player.dart';
+import '../../state/app_state.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_text.dart';
@@ -85,6 +87,8 @@ class _FakeFactScreenState extends State<FakeFactScreen> {
       }
       _phase = _FactPhase.resolution;
     });
+    // Resolving is the end of a round for the promo pacing.
+    context.read<AppState>().markRoundFinished();
   }
 
   @override

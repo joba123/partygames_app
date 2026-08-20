@@ -24,6 +24,7 @@ import 'games/truth_or_dare_screen.dart';
 import 'games/werewolf_screen.dart';
 import 'games/word_race_screen.dart';
 import 'impostor/impostor_flow_screen.dart';
+import 'shared/category_picker_screen.dart';
 import 'shared/team_setup_screen.dart';
 
 /// Screen 03 — shared player-setup module for every game. Names persist
@@ -67,20 +68,33 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
       return;
     }
     appState.markPlayed(game.id);
+    // A previous round may have left an override behind; the picker below
+    // sets a fresh one, and games without a picker use the global settings.
+    appState.clearRoundCategories();
     final players = List.of(appState.players);
 
-    // Team games get one more setup step; everything else starts right away.
-    final route = game.needsTeams
-        ? MaterialPageRoute<void>(
-            builder: (_) => TeamSetupScreen(
-              game: game,
-              players: players,
-              gameBuilder: (teams) => _teamGame(game, teams),
-            ),
-          )
-        : MaterialPageRoute<void>(builder: (_) => _soloGame(game, players));
+    // The roster is step one; categories and teams add one each when the game
+    // needs them, so the counter in the header always matches reality.
+    final totalSteps = 1 + (game.picksCategories ? 1 : 0) + (game.needsTeams ? 1 : 0);
 
-    Navigator.of(context).push(route);
+    Widget teamsOrGame() => game.needsTeams
+        ? TeamSetupScreen(
+            game: game,
+            players: players,
+            stepLabel: 'Schritt $totalSteps von $totalSteps',
+            gameBuilder: (teams) => _teamGame(game, teams),
+          )
+        : _soloGame(game, players);
+
+    final next = game.picksCategories
+        ? CategoryPickerScreen(
+            game: game,
+            stepLabel: 'Schritt 2 von $totalSteps',
+            onStart: teamsOrGame,
+          )
+        : teamsOrGame();
+
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => next));
   }
 
   Widget _soloGame(GameInfo game, List<Player> players) {
@@ -139,7 +153,7 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
                     children: [
                       AppIconButton(icon: Icons.arrow_back_ios_new_rounded, onTap: () => Navigator.of(context).pop()),
                       const SizedBox(width: 14),
-                      Text(game == null ? 'GRUPPE VERWALTEN' : 'SCHRITT 1 VON 2', style: AppText.labelMono(p.textMuted, size: 11)),
+                      Text(game == null ? 'GRUPPE VERWALTEN' : 'SCHRITT 1', style: AppText.labelMono(p.textMuted, size: 11)),
                     ],
                   ),
                   const SizedBox(height: 14),
@@ -246,10 +260,12 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
               child: Column(
                 children: [
                   AppButton(
-                    label: switch (game?.playKind) {
+                    label: switch (game) {
                       null => 'Fertig',
-                      GamePlayKind.impostor => 'Weiter zu den Rollen',
-                      _ => game!.needsTeams ? 'Weiter zu den Teams' : 'Weiter zum Spiel',
+                      _ when game.picksCategories => 'Weiter zu den Kategorien',
+                      _ when game.needsTeams => 'Weiter zu den Teams',
+                      _ when game.playKind == GamePlayKind.impostor => 'Weiter zu den Rollen',
+                      _ => 'Weiter zum Spiel',
                     },
                     size: AppButtonSize.large,
                     onPressed: canContinue ? () => _continue(appState) : null,

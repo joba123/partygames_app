@@ -12,6 +12,10 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   provider: ^6.1.2
+  # Pro-Status, Einstellungen und Spielernamen müssen den Neustart überleben.
+  shared_preferences: ^2.3.2
+  # Öffnet den Store-Eintrag für die Bewertungs-Aufforderung.
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

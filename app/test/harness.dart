@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:imposter_party/models/player.dart';
 import 'package:imposter_party/state/app_state.dart';
 import 'package:imposter_party/theme/app_theme.dart';
 import 'package:provider/provider.dart';
+
+/// Gives the preferences plugin an in-memory store. Without it every read
+/// hangs on a platform channel that nothing answers in a widget test.
+void useFakePreferences([Map<String, Object> initial = const {}]) {
+  SharedPreferences.setMockInitialValues(Map.of(initial));
+}
 
 /// Mounts a single screen with the providers and theme it expects, so game
 /// screens can be tested without walking through splash and hub every time.

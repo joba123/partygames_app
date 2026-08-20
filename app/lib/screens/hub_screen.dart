@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../data/games.dart';
+import '../monetization/promo_policy.dart';
 import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_palette.dart';
@@ -8,8 +9,10 @@ import '../theme/app_spacing.dart';
 import '../theme/app_text.dart';
 import '../widgets/buttons.dart';
 import '../widgets/game_tile.dart';
+import '../widgets/rate_app_sheet.dart';
 import 'player_setup_screen.dart';
 import 'settings_screen.dart';
+import 'shared/house_ad_screen.dart';
 
 /// Screen 02 / 02b — Hub, dark by default, light via ThemeMode.light.
 /// Hero card = last-played (Impostor); 2-col grid below, filterable by
@@ -24,8 +27,23 @@ class HubScreen extends StatefulWidget {
 class _HubScreenState extends State<HubScreen> {
   int _navIndex = 0;
 
-  void _openGame(GameInfo game) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => PlayerSetupScreen(game: game)));
+  Future<void> _openGame(GameInfo game) async {
+    await Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (_) => PlayerSetupScreen(game: game)));
+    if (!mounted) return;
+    await _checkInterruptions();
+  }
+
+  /// Anything the app wants from the group happens here — back on the hub,
+  /// between rounds, never inside a game.
+  Future<void> _checkInterruptions() async {
+    final interruption = PromoPolicy.nextInterruption(context.read<AppState>());
+    if (interruption == Interruption.none) return;
+    if (interruption == Interruption.rating) {
+      await RateAppSheet.present(context);
+    } else {
+      await HouseAdScreen.present(context);
+    }
   }
 
   @override

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../state/app_state.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_text.dart';
@@ -14,7 +16,11 @@ class ScoreEntry {
 
 /// Shared podium for every game that keeps score. Ties are shown as ties —
 /// nothing is invented to force a single winner.
-class GameResultScreen extends StatelessWidget {
+///
+/// Reaching this screen is what counts as "a round played" for the promo and
+/// rating pacing, so the counter is bumped here rather than in ten game
+/// screens that would each have to remember.
+class GameResultScreen extends StatefulWidget {
   const GameResultScreen({
     super.key,
     required this.title,
@@ -40,10 +46,25 @@ class GameResultScreen extends StatelessWidget {
   final bool lowerIsBetter;
 
   @override
+  State<GameResultScreen> createState() => _GameResultScreenState();
+}
+
+class _GameResultScreenState extends State<GameResultScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // initState runs inside the build phase, and markRoundFinished notifies
+    // listeners — doing it inline throws "setState() called during build".
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<AppState>().markRoundFinished();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    final ranked = List.of(entries)
-      ..sort((a, b) => lowerIsBetter ? a.score.compareTo(b.score) : b.score.compareTo(a.score));
+    final ranked = List.of(widget.entries)
+      ..sort((a, b) => widget.lowerIsBetter ? a.score.compareTo(b.score) : b.score.compareTo(a.score));
     final topScore = ranked.isEmpty ? 0 : ranked.first.score;
     final winners = ranked.where((e) => e.score == topScore).toList();
 
@@ -59,13 +80,13 @@ class GameResultScreen extends StatelessWidget {
                   Text('ENDSTAND', style: AppText.labelMono(p.textMuted, size: 11)),
                   const SizedBox(height: 10),
                   Text(
-                    winners.length == 1 ? '${winners.first.name} gewinnt' : title,
+                    winners.length == 1 ? '${winners.first.name} gewinnt' : widget.title,
                     textAlign: TextAlign.center,
                     style: AppText.headline(p.textPrimary),
                   ),
-                  if (subtitle != null) ...[
+                  if (widget.subtitle != null) ...[
                     const SizedBox(height: 8),
-                    Text(subtitle!, textAlign: TextAlign.center, style: AppText.bodySmall(p.textSecondary)),
+                    Text(widget.subtitle!, textAlign: TextAlign.center, style: AppText.bodySmall(p.textSecondary)),
                   ] else if (winners.length > 1) ...[
                     const SizedBox(height: 8),
                     Text('Unentschieden zwischen ${winners.map((w) => w.name).join(', ')}.',
@@ -110,7 +131,7 @@ class GameResultScreen extends StatelessWidget {
                         const SizedBox(width: 10),
                         Text('${e.score}', style: AppText.monoValue(p.textPrimary, size: 22, weight: FontWeight.w700)),
                         const SizedBox(width: 6),
-                        Text(germanUpper(scoreUnit), style: AppText.labelMono(p.textFaint, size: 10)),
+                        Text(germanUpper(widget.scoreUnit), style: AppText.labelMono(p.textFaint, size: 10)),
                       ],
                     ),
                   );
@@ -121,9 +142,9 @@ class GameResultScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(AppSpacing.screenPadding, 16, AppSpacing.screenPadding, 30),
               child: Column(
                 children: [
-                  AppButton(label: 'Nochmal', size: AppButtonSize.large, onPressed: onRematch),
+                  AppButton(label: 'Nochmal', size: AppButtonSize.large, onPressed: widget.onRematch),
                   const SizedBox(height: 10),
-                  AppButton(label: 'Zurück zur Übersicht', filled: false, onPressed: onExit),
+                  AppButton(label: 'Zurück zur Übersicht', filled: false, onPressed: widget.onExit),
                 ],
               ),
             ),

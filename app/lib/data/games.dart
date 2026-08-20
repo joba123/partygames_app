@@ -56,6 +56,7 @@ class GameInfo {
     required this.playKind,
     required this.minPlayers,
     this.needsTeams = false,
+    this.picksCategories = false,
     this.badge,
   });
 
@@ -72,6 +73,11 @@ class GameInfo {
 
   /// Splits the roster into two teams before the first round.
   final bool needsTeams;
+
+  /// Offers the category picker before the round starts. Only true for games
+  /// whose deck is actually rated — picking "Für Mutige" for Charade would
+  /// change nothing and would only teach players the step is pointless.
+  final bool picksCategories;
 
   final String? badge;
 }
@@ -97,6 +103,7 @@ const games = <GameInfo>[
     meta: '3–12 SPIELER · OFFEN',
     playKind: GamePlayKind.truthOrDare,
     minPlayers: 3,
+    picksCategories: true,
   ),
   GameInfo(
     id: GameId.werWuerdeEher,
@@ -107,6 +114,7 @@ const games = <GameInfo>[
     meta: '3–12 SPIELER · SCHNELL',
     playKind: GamePlayKind.pointVote,
     minPlayers: 3,
+    picksCategories: true,
   ),
   GameInfo(
     id: GameId.bombe,
@@ -127,6 +135,7 @@ const games = <GameInfo>[
     meta: '3–12 SPIELER · OFFEN',
     playKind: GamePlayKind.neverHaveIEver,
     minPlayers: 3,
+    picksCategories: true,
   ),
   GameInfo(
     id: GameId.trinkspielRoulette,
@@ -137,6 +146,7 @@ const games = <GameInfo>[
     meta: '3–12 SPIELER · SCHNELL',
     playKind: GamePlayKind.roulette,
     minPlayers: 3,
+    picksCategories: true,
   ),
   GameInfo(
     id: GameId.charade,
@@ -158,6 +168,7 @@ const games = <GameInfo>[
     meta: '4–12 SPIELER · SCHNELL',
     playKind: GamePlayKind.duel,
     minPlayers: 4,
+    picksCategories: true,
   ),
   GameInfo(
     id: GameId.quizBattle,
@@ -233,6 +244,7 @@ const games = <GameInfo>[
     meta: '3–12 SPIELER · OFFEN',
     playKind: GamePlayKind.hundredQuestions,
     minPlayers: 3,
+    picksCategories: true,
   ),
   GameInfo(
     id: GameId.zehnVonZehn,
@@ -243,6 +255,7 @@ const games = <GameInfo>[
     meta: '3–12 SPIELER · SCHNELL',
     playKind: GamePlayKind.tenOutOfTen,
     minPlayers: 3,
+    picksCategories: true,
   ),
   GameInfo(
     id: GameId.circa,
