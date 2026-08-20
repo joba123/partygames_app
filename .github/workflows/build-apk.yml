@@ -1,0 +1,136 @@
+name: Build Android APK
+
+# Baut das Release-APK, hängt es als Artefakt an den Run und lädt es zu
+# Appetize hoch. Der Appetize-Link steht danach in der Run-Zusammenfassung.
+#
+# Einmalig einrichten:
+#   Settings → Secrets   → APPETIZE_API_TOKEN   (nötig für den Upload)
+#   Settings → Variables → APPETIZE_PUBLIC_KEY  (optional, nach dem 1. Run
+#     setzen, damit weitere Runs dieselbe App aktualisieren statt jedes Mal
+#     eine neue anzulegen)
+#
+# Ohne das Secret wird nur der Upload-Schritt übersprungen, der Build läuft
+# trotzdem durch und das APK liegt unter "Artifacts".
+#
+# Signing: Der Release-Buildtype signiert laut app/android/app/build.gradle.kts
+# mit dem Debug-Key. Kein Keystore nötig; für Appetize und Testgeräte reicht
+# das, für den Play Store nicht.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'app/**'
+      - '.github/workflows/build-apk.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    env:
+      # Auf Job-Ebene, damit das `if:` des Upload-Schritts sie sehen kann —
+      # ein step-eigener env-Block ist in dessen eigener Bedingung nicht sichtbar.
+      APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}
+      APPETIZE_PUBLIC_KEY: ${{ vars.APPETIZE_PUBLIC_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Java 17 passt zu sourceCompatibility/jvmTarget im Gradle-Setup des
+      # Projekts. Neuere JDKs bauen zwar meist auch, weichen aber unnötig ab.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.0'
+          channel: stable
+          cache: true
+
+      - name: Abhängigkeiten holen
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Tests
+        run: flutter test
+
+      - name: Release-APK bauen
+        run: flutter build apk --release
+
+      - name: APK hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: imposter-apk-${{ github.sha }}
+          path: app/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+
+      - name: Zu Appetize hochladen
+        # Fehlt das Secret, wird übersprungen statt fehlzuschlagen.
+        if: ${{ env.APPETIZE_API_TOKEN != '' }}
+        run: |
+          set -euo pipefail
+          apk="build/app/outputs/flutter-apk/app-release.apk"
+
+          if [ -n "${APPETIZE_PUBLIC_KEY}" ]; then
+            endpoint="https://api.appetize.io/v1/apps/${APPETIZE_PUBLIC_KEY}"
+          else
+            endpoint="https://api.appetize.io/v1/apps"
+          fi
+
+          # Token als Basic-Auth-Benutzername mit leerem Passwort. Über -u statt
+          # in der URL, damit es in keiner Fehlerausgabe landet.
+          code=$(curl -sS -o resp.json -w '%{http_code}' \
+            -u "${APPETIZE_API_TOKEN}:" \
+            -F "file=@${apk}" \
+            -F "platform=android" \
+            "${endpoint}")
+
+          if [ "${code}" -ge 400 ]; then
+            echo "Appetize-Upload fehlgeschlagen: HTTP ${code}" >&2
+            jq -r 'keys[]?' resp.json 2>/dev/null >&2 || true
+            exit 1
+          fi
+
+          echo "APPETIZE_URL=$(jq -r '.appURL // empty' resp.json)" >> "$GITHUB_ENV"
+          echo "APPETIZE_KEY=$(jq -r '.publicKey // empty' resp.json)" >> "$GITHUB_ENV"
+
+      - name: Zusammenfassung
+        if: always()
+        run: |
+          set -euo pipefail
+          apk="build/app/outputs/flutter-apk/app-release.apk"
+          {
+            echo "### APK fertig"
+            echo ""
+            [ -f "$apk" ] && echo "- Größe: $(du -h "$apk" | cut -f1)"
+            echo "- Commit: \`${GITHUB_SHA:0:7}\`"
+            if [ -n "${APPETIZE_URL:-}" ]; then
+              echo ""
+              echo "**Im Browser testen: ${APPETIZE_URL}**"
+            fi
+            if [ -n "${APPETIZE_KEY:-}" ] && [ -z "${APPETIZE_PUBLIC_KEY}" ]; then
+              echo ""
+              echo "publicKey \`${APPETIZE_KEY}\` als Repo-Variable"
+              echo "\`APPETIZE_PUBLIC_KEY\` speichern, damit spätere Runs diese App"
+              echo "aktualisieren statt eine neue anzulegen."
+            fi
+            if [ -z "${APPETIZE_API_TOKEN}" ]; then
+              echo ""
+              echo "_Kein APPETIZE_API_TOKEN gesetzt — Upload übersprungen._"
+              echo "APK unter **Artifacts** herunterladen."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

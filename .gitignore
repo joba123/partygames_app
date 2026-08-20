@@ -1,0 +1,26 @@
+# Flutter / Dart
+app/build/
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/.packages
+app/pubspec.lock
+
+# Android
+app/android/.gradle/
+app/android/local.properties
+app/android/key.properties
+*.keystore
+*.jks
+
+# iOS
+app/ios/Pods/
+app/ios/.symlinks/
+app/ios/Flutter/Flutter.framework
+app/ios/Flutter/Flutter.podspec
+
+# Tooling
+.idea/
+.vscode/
+*.iml
+.DS_Store
